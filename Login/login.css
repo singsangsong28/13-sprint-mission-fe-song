@@ -19,8 +19,8 @@
   overflow-y: hidden;
 }
 
-.email-input:focus,
-.pw-input:focus {
+#email:focus,
+#password:focus {
   outline: none;
   border: 1px solid var(--primary100);
 }
@@ -69,50 +69,20 @@
 }
 
 /* 이메일 비밀번호 파트 */
-.input {
+.login-form {
   display: flex;
+  flex-direction: column;
   width: 100%;
 }
 
-.email-sec {
+.input-group {
   display: flex;
   flex-direction: column;
   gap: 16px;
   margin-bottom: 24px;
 }
 
-.email {
-  font-family: Pretendard;
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 26px;
-  color: var(--gray300);
-}
-
-.email-input {
-  font-family: Pretendard;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 26px;
-  color: var(--gray200);
-  background-color: var(--gray100);
-  width: 640px;
-  height: 56px;
-  border-radius: 12px;
-  padding: 16px 24px;
-}
-
-.pw-sec {
-  display: flex;
-  justify-content: space-between;
-  width: 640px;
-  height: 56px;
-  border-radius: 12px;
-  padding: 16px 24px;
-  background-color: var(--gray100);
-}
-
-.pw {
+.form-label {
   font-family: Pretendard;
   font-weight: 700;
   font-size: 18px;
@@ -121,17 +91,58 @@
   margin-bottom: 16px;
 }
 
-.pw-input {
+#email {
   font-family: Pretendard;
   font-weight: 400;
   font-size: 16px;
   line-height: 26px;
   color: var(--gray200);
+  background-color: var(--gray100);
+  width: 640px;
+  height: 56px;
+  border-radius: 12px;
+  padding: 16px 24px;
+  border: none;
+}
+
+.pw-wrapper {
+  position: relative;
+  width: 640px;
+}
+
+#password {
+  width: 100%;
+  height: 56px;
+  border-radius: 12px;
+  padding: 16px 48px 16px 24px; /* 오른쪽 공간 확보 */
+  background-color: var(--gray100);
+  font-family: Pretendard;
+  font-size: 16px;
+  color: var(--gray200);
+  border: none;
+  outline: none;
 }
 
 .visible-btn {
-  display: flex;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.visible-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--gray300);
 }
 
 .login-btn {
