@@ -12,10 +12,6 @@
   overflow-x: hidden;
 }
 
-.body a {
-  cursor: pointer;
-}
-
 /*header 전체 레이아웃*/
 .header {
   background-color: var(--gray50);
