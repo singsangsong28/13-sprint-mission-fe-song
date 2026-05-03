@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./login.css" />
+    <link rel="stylesheet" href="/reset.css/reset.css" />
+    <title>판다마켓 로그인</title>
+  </head>
+  <body class="body">
+    <section class="login-sec">
+      <div class="home-wrapper">
+        <div class="market-logo">
+          <a href="/">
+            <img
+              src="/header-img/login-header.png"
+              alt="판다마켓"
+              class="logo-img"
+            />
+          </a>
+        </div>
+        <div class="logo-text">
+          <a href="/" class="logo-text">판다마켓</a>
+        </div>
+      </div>
+
+      <form class="login-form">
+        <!-- 이메일 입력 -->
+          <div class="input-group">
+            <label for="email" class="form-label">이메일</label>
+            <input id="email" class="form-input" type="email" name="email" placeholder="이메일을 입력해주세요" pattern=".+@gmail\.com" autocomplete="on" required="">
+          </div>          
+          <!-- 비밀번호 입력 -->
+             <div class="input-group">
+            <label for="password" class="form-label">비밀번호</label>
+          <div class="pwinput-group">
+            <div class="pw-wrapper">
+  <input id="password" class="form-input" type="password" name="password" 
+         placeholder="비밀번호를 입력해주세요" autocomplete="on" required>
+  <button type="button" class="visible-btn" onclick="togglePassword()">
+    <img src="./btn_visibility_off_24px.png" alt="visible-btn" class="visible-btn">
+              </button>
+</div>
+
+      
+            </div>
+          </div>
+          <li class="login-btn">로그인</li>
+      </div>
+
+      <div class="link-out">
+        <div class="nav">
+          <div class="simple-in">간편 로그인하기</div>
+          <div class="favicon">
+            <div class="google-fav">
+              <a href="https://www.google.com/">
+                <img
+                  src="/Login/google-favicon.png"
+                  alt="google"
+                  class="google-fav"
+                />
+              </a>
+            </div>
+            <div class="kakao-fav">
+              <a href="https://www.kakaocorp.com/page/">
+                <img
+                  src="/Login/kakao-favicon.png"
+                  alt="카카오톡"
+                  class="kakao-fav"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="signup-link">
+        <ul class="text-wrapper">
+          <li class="text1">판다마켓이 처음이신가요?</li>
+          <li class="link-signup">
+            <a href="/Login/singup.html" class="signup-link">회원가입</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </body>
+</html>
