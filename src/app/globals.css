@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #111827;
+
+  --primary-100: #3692ff;
+  --primary-200: #1967d6;
+  --primary-300: #1251aa;
+
+  --error-red: #f74747;
+
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+
+  --layout-max-width: 1200px;
+  --layout-padding: 16px;
+}
+
+@theme inline {
+  --breakpoint-tablet: 744px;
+  --breakpoint-desktop: 1200px;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-error-red: var(--error-red);
+  --color-gray-50: var(--gray-50);
+  --color-gray-100: var(--gray-100);
+  --color-gray-200: var(--gray-200);
+  --color-gray-400: var(--gray-400);
+  --color-gray-500: var(--gray-500);
+  --color-gray-600: var(--gray-600);
+  --color-gray-700: var(--gray-700);
+  --color-gray-800: var(--gray-800);
+  --color-gray-900: var(--gray-900);
+  --font-sans: var(--font-pretendard-variable);
+  --font-rokaf: var(--font-rokaf-sans);
+}
+
+@media (min-width: 744px) {
+  :root {
+    --layout-padding: 24px;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --layout-padding: 0px;
+  }
+}
+
+@layer utilities {
+  .page-container {
+    width: min(
+      calc(100% - (var(--layout-padding) * 2)),
+      var(--layout-max-width)
+    );
+    margin-inline: auto;
+  }
+}
+
+/* 오류로 주석 처리 */
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+} */
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-pretendard-variable), Arial, Helvetica, sans-serif;
+}
