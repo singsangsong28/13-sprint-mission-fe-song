@@ -1,4 +1,3 @@
-// CommentItem.jsx
 "use client";
 import Image from "next/image";
 import { useState } from "react";
@@ -16,7 +15,7 @@ function timeAgo(dateString) {
   return `${Math.floor(diff / 31536000)}년 전`;
 }
 
-export default function CommentItem({ comment, onUpdate, onDelete }) {
+export default function InquiryItem({ comment, onUpdate, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(comment.content);
 
@@ -32,13 +31,11 @@ export default function CommentItem({ comment, onUpdate, onDelete }) {
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="bg-gray-100 w-full px-6 py-4 rounded-xl resize-none  mt-10 mb-4 "
+            className="bg-gray-100 w-full px-6 py-4 rounded-xl resize-none mt-10 mb-4"
           />
         ) : (
           <p>{comment.content}</p>
         )}
-
-        {/* 수정 중이 아닐 때만 케밥 메뉴 노출 */}
         {!isEditing && (
           <KebabMenu
             onEdit={() => setIsEditing(true)}
@@ -56,7 +53,6 @@ export default function CommentItem({ comment, onUpdate, onDelete }) {
             취소
           </button>
           <button
-            type="submit"
             onClick={handleSave}
             className="text-white rounded-lg bg-primary-100 py-3 px-[23px] cursor-pointer"
           >
@@ -67,13 +63,13 @@ export default function CommentItem({ comment, onUpdate, onDelete }) {
 
       <div className="flex items-center gap-2 mt-6 text-sm mb-3">
         <Image
-          src="/images/ic_profile.png"
+          src={comment.writer?.image || "/images/ic_profile.png"}
           alt="profile"
           width={40}
           height={40}
         />
         <div className="flex flex-col gap-1">
-          <span>{comment.id}</span>
+          <span>{comment.writer?.nickname}</span>
           <span className="text-gray-500">{timeAgo(comment.createdAt)}</span>
         </div>
       </div>

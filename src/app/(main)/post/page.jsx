@@ -2,10 +2,12 @@
 import Button from "@/components/common/Button";
 import Loading from "@/components/common/Loading";
 import { createPost } from "@/lib/PostAPI";
+import { useAuth } from "@/providers/providers";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function PostPage() {
+  const { user } = useAuth();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +20,7 @@ export default function PostPage() {
       const newPost = await createPost({
         title,
         content,
-        ownerId: 1, // 임시값, 로그인 연동 후 실제 유저 id로 교체
+        ownerId: user?.id,
       });
       router.push("/community");
     } catch (error) {

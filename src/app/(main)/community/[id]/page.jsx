@@ -11,5 +11,5 @@ export default async function CommunityDetail({ params }) {
       <ArticleDetail post={post} />
       <CommentSection postId={id} />
     </div>
-  );
+  );  
 }

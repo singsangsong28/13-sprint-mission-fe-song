@@ -1,11 +1,25 @@
 "use client";
 
+import { getMe } from "@/lib/UserAPI";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const pathname = usePathname();
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    setToken(localStorage.getItem("accessToken"));
+  }, []);
+
+  const { data: user } = useQuery({
+    queryKey: ["me"],
+    queryFn: () => getMe(token),
+    enabled: !!token,
+  });
 
   const getLinkClass = (href) =>
     `whitespace-nowrap font-bold text-[16px] tablet:text-[18px] px-[6px] tablet:px-[15px] py-[21px] ${
@@ -34,15 +48,30 @@ export default function Header() {
             <Link href="/community">
               <div className={getLinkClass("/community")}>자유게시판</div>
             </Link>
-            <Link href="/shop">
-              <div className={getLinkClass("/shop")}>중고마켓</div>
+            <Link href="/items">
+              <div className={getLinkClass("/items")}>중고마켓</div>
             </Link>
           </div>
-          <Link href="/login">
-            <div className="whitespace-nowrap px-[14px] tablet:px-[24px] py-[23px] bg-primary-100 rounded-[8px] h-[42px] text-white font-bold text-[16px] tablet:text-[18px] my-[14px] flex items-center">
-              로그인
+          {user ? (
+            <div className="flex items-center gap-2">
+              <Image
+                src={user.image ?? "/images/ic_profile.png"}
+                width={40}
+                height={40}
+                alt="프로필"
+                className="rounded-full"
+              />
+              <span className="font-normal text-[18px] text-gray-600 hidden tablet:block">
+                {user.nickname}
+              </span>
             </div>
-          </Link>
+          ) : (
+            <Link href="/login">
+              <div className="whitespace-nowrap px-[14px] tablet:px-[24px] py-[23px] bg-primary-100 rounded-[8px] h-[42px] text-white font-bold text-[16px] tablet:text-[18px] my-[14px] flex items-center">
+                로그인
+              </div>
+            </Link>
+          )}
         </div>
       </div>
     </>

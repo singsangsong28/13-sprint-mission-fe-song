@@ -15,7 +15,7 @@ export default function ArticleDetail({ post }) {
             width={40}
             height={40}
           />
-          <span>{post.id}</span>
+          <span>{post.writer.nickname}</span>
           <span>{new Date(post.createdAt).toLocaleDateString()}</span>
           <span className="rounded-[35px] border-1 px-3 py-2 ">
             {" "}

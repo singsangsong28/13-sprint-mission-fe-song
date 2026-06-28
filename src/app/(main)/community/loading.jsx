@@ -1,4 +1,3 @@
-// app/community/loading.js
 import Loading from "@/components/common/Loading";
 
 export default function CommunityLoading() {
