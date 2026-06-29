@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from "@/providers/providers";
 import Image from "next/image";
 import { useState } from "react";
 import KebabMenu from "./KebabMenu";
@@ -18,6 +19,8 @@ function timeAgo(dateString) {
 export default function InquiryItem({ comment, onUpdate, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(comment.content);
+  const { user } = useAuth();
+  const isOwner = user?.id === comment.writer.id;
 
   const handleSave = async () => {
     await onUpdate(comment.id, content);
@@ -36,7 +39,7 @@ export default function InquiryItem({ comment, onUpdate, onDelete }) {
         ) : (
           <p>{comment.content}</p>
         )}
-        {!isEditing && (
+        {!isEditing && isOwner && (
           <KebabMenu
             onEdit={() => setIsEditing(true)}
             onDelete={() => onDelete(comment.id)}
