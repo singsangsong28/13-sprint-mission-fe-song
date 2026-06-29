@@ -1,4 +1,4 @@
-import { defaultFetch, dynamicFetch } from './fetchClient';
+import { defaultFetch, dynamicFetch, tokenFetch } from './fetchClient';
 
 export async function getBestPosts() {
   const data = await dynamicFetch('/articles?limit=3&orderBy=like');
@@ -31,10 +31,10 @@ export async function getComments(articleId) {
 }
 
 export const createComment = (articleId, { content }) =>
-  defaultFetch(`/articles/${articleId}/comments`, { method: 'POST', body: JSON.stringify({ content }) });
+  tokenFetch(`/articles/${articleId}/comments`, { method: 'POST', body: JSON.stringify({ content }) });
 
 export const updateComment = (commentId, { content }) =>
-  defaultFetch(`/comments/${commentId}`, { method: 'PATCH', body: JSON.stringify({ content }) });
+  tokenFetch(`/comments/${commentId}`, { method: 'PATCH', body: JSON.stringify({ content }) });
 
 export const deleteComment = (commentId) =>
-  defaultFetch(`/comments/${commentId}`, { method: 'DELETE' });
+  tokenFetch(`/comments/${commentId}`, { method: 'DELETE' });
