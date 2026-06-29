@@ -6,12 +6,17 @@ export async function getBestPosts() {
 }
 
 export async function getPosts(orderBy = 'recent', keyword = '') {
-  const apiOrderBy = orderBy === 'oldest' ? 'recent' : orderBy;
-  const params = new URLSearchParams({ orderBy: apiOrderBy, pageSize: '4' });
+  if (orderBy === 'oldest') {
+    const params = new URLSearchParams({ orderBy: 'recent', pageSize: '9999' });
+    if (keyword) params.set('keyword', keyword);
+    const data = await dynamicFetch(`/articles?${params.toString()}`);
+    return (data.list ?? []).reverse();
+  }
+
+  const params = new URLSearchParams({ orderBy, pageSize: '4' });
   if (keyword) params.set('keyword', keyword);
   const data = await dynamicFetch(`/articles?${params.toString()}`);
-  const list = data.list ?? [];
-  return orderBy === 'oldest' ? list.reverse() : list;
+  return data.list ?? [];
 }
 
 export const getPostById = (id) => dynamicFetch(`/articles/${id}`);
