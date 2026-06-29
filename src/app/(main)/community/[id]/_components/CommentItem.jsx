@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from "@/providers/providers";
 import Image from "next/image";
 import { useState } from "react";
 import KebabMenu from "./KebabMenu";
@@ -16,6 +17,8 @@ function timeAgo(dateString) {
 }
 
 export default function CommentItem({ comment, onUpdate, onDelete }) {
+  const { user } = useAuth();
+  const isOwner = user?.id === comment.writer.id;
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(comment.content);
 
@@ -38,7 +41,7 @@ export default function CommentItem({ comment, onUpdate, onDelete }) {
         )}
 
         {/* 수정 중이 아닐 때만 케밥 메뉴 노출 */}
-        {!isEditing && (
+        {!isEditing && isOwner && (
           <KebabMenu
             onEdit={() => setIsEditing(true)}
             onDelete={() => onDelete(comment.id)}

@@ -1,12 +1,16 @@
+"use client";
+import { useAuth } from "@/providers/providers";
 import Image from "next/image";
 import PostKebabMenu from "./PostKebabMenu";
 export default function ArticleDetail({ post }) {
+  const { user } = useAuth();
+  const isOwner = user?.id === post.writer.id;
   return (
     <div className=" pb-4 mb-4">
       <div className="flex flex-col gap-4 ">
         <div className="flex justify-between items-start">
           <h1 className="text-xl font-bold">{post.title}</h1>
-          <PostKebabMenu postId={post.id} />
+          {isOwner && <PostKebabMenu postId={post.id} />}
         </div>
         <div className="flex items-center gap-2 mt-2 text-sm text-gray-500 w-[354px] h-[40px]">
           <Image

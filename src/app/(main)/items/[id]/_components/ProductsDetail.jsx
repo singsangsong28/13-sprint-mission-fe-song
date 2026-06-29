@@ -8,6 +8,7 @@ import {
   unfavoriteProduct,
   updateProduct,
 } from "@/lib/ProductApi";
+import { useAuth } from "@/providers/providers";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -15,6 +16,7 @@ import { useEffect, useState } from "react";
 import KebabMenu from "./KebabMenu";
 
 export default function ProductsDetail({ productId, initialProduct }) {
+  const { user } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
@@ -74,8 +76,11 @@ export default function ProductsDetail({ productId, initialProduct }) {
     favoriteCount,
     createdAt,
     ownerNickname,
+    ownerId,
     isFavorite,
   } = product;
+
+  const isOwner = user?.id === ownerId;
 
   const date = new Date(createdAt).toLocaleDateString("ko-KR", {
     year: "numeric",
@@ -112,13 +117,15 @@ export default function ProductsDetail({ productId, initialProduct }) {
             ) : (
               <h1 className="font-semibold text-2xl">{name}</h1>
             )}
-            <KebabMenu
-              onEdit={() => {
-                setEditForm({ name, description, price, tags });
-                setIsEditing(true);
-              }}
-              onDelete={() => setShowDeleteModal(true)}
-            />
+            {isOwner && (
+              <KebabMenu
+                onEdit={() => {
+                  setEditForm({ name, description, price, tags });
+                  setIsEditing(true);
+                }}
+                onDelete={() => setShowDeleteModal(true)}
+              />
+            )}
           </div>
 
           {isEditing ? (
