@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function PostsCard({ post }) {
-  const { id, title, content, image, likeCount, createdAt } = post;
+  const { id, title, image, likeCount, createdAt, writer } = post;
   const date = new Date(createdAt).toLocaleDateString("ko-KR", {
     year: "numeric",
     month: "2-digit",
@@ -19,7 +19,7 @@ export default function PostsCard({ post }) {
         </p>
         <div className="relative w-[88px] h-[88px] flex-shrink-0">
           <Image
-            src={image || "/placeholder-bestPost.jpg"}
+            src={image || "/images/alt_image.png"}
             alt="자유게시판 게시글"
             fill
             sizes="88px"
@@ -36,7 +36,7 @@ export default function PostsCard({ post }) {
             height={24}
             alt="프로필 사진"
           />
-          <span className="text-[14px]">{id}</span>
+          <span className="text-[14px]">{writer.nickname}</span>
           <span className="text-[14px]">{date}</span>
         </div>
         <span className="flex items-center gap-1 text-[16px]">

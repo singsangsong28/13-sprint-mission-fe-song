@@ -1,3 +1,4 @@
+import Button from "@/components/common/Button";
 import BestCard from "@/components/ui/BestCard";
 import PostsCard from "@/components/ui/PostsCard";
 import SearchInput from "@/components/ui/SeartchInput";
@@ -25,7 +26,7 @@ export default async function CommunityPage({ searchParams }) {
         <div className="mb-[40px] grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-4">
           {bestPosts.map((best, index) => (
             <div
-              key={best.title}
+              key={best.id}
               // 반응형 태블릿 2개 모바일 1개
               className={
                 index === 0
@@ -47,9 +48,7 @@ export default async function CommunityPage({ searchParams }) {
           게시글
         </p>
         <Link href="/post">
-          <button className="cursor-pointer rounded-[8px] bg-primary-100 px-[24px] tablet:px-[23px] py-[14px] tablet:py-[12px] text-white text-[18px] tablet:text-[16px] font-semibold flex justify-center">
-            글쓰기
-          </button>
+          <Button>글쓰기</Button>
         </Link>
       </div>
 
@@ -62,7 +61,7 @@ export default async function CommunityPage({ searchParams }) {
       {/* 정렬 된 게시글 */}
       <div className="mb-[40px] grid grid-cols-1 gap-[24px]">
         {posts.map((post) => (
-          <PostsCard key={post.title} post={post} />
+          <PostsCard key={post.id} post={post} />
         ))}
       </div>
     </div>

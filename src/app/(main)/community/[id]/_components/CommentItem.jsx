@@ -1,5 +1,5 @@
-// CommentItem.jsx
 "use client";
+import { useAuth } from "@/providers/providers";
 import Image from "next/image";
 import { useState } from "react";
 import KebabMenu from "./KebabMenu";
@@ -17,6 +17,8 @@ function timeAgo(dateString) {
 }
 
 export default function CommentItem({ comment, onUpdate, onDelete }) {
+  const { user } = useAuth();
+  const isOwner = user?.id === comment.writer.id;
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(comment.content);
 
@@ -39,7 +41,7 @@ export default function CommentItem({ comment, onUpdate, onDelete }) {
         )}
 
         {/* 수정 중이 아닐 때만 케밥 메뉴 노출 */}
-        {!isEditing && (
+        {!isEditing && isOwner && (
           <KebabMenu
             onEdit={() => setIsEditing(true)}
             onDelete={() => onDelete(comment.id)}
@@ -67,13 +69,13 @@ export default function CommentItem({ comment, onUpdate, onDelete }) {
 
       <div className="flex items-center gap-2 mt-6 text-sm mb-3">
         <Image
-          src="/images/ic_profile.png"
+          src={comment.writer?.image || "/images/ic_profile.png"}
           alt="profile"
           width={40}
           height={40}
         />
         <div className="flex flex-col gap-1">
-          <span>{comment.id}</span>
+          <span>{comment.writer?.nickname}</span>
           <span className="text-gray-500">{timeAgo(comment.createdAt)}</span>
         </div>
       </div>

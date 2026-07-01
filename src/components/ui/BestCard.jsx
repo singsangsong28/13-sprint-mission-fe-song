@@ -1,9 +1,8 @@
-// components/ui/BestCard.jsx
 import Image from "next/image";
 import Link from "next/link";
 
 export default function BestCard({ post }) {
-  const { id, title, content, image, likeCount, createdAt } = post;
+  const { id, title, image, likeCount, createdAt, writer } = post;
   const date = new Date(createdAt).toLocaleDateString("ko-KR", {
     year: "numeric",
     month: "2-digit",
@@ -23,7 +22,7 @@ export default function BestCard({ post }) {
         </p>
         <div className="relative w-[88px] h-[88px] flex-shrink-0">
           <Image
-            src={image}
+            src={image || "/images/alt_image.png"}
             alt={title}
             fill
             sizes="88px"
@@ -32,7 +31,7 @@ export default function BestCard({ post }) {
         </div>
       </div>
       <div className="flex items-center gap-2 text-sm text-gray-400 mt-6 px-6 pb-6">
-        <span>{id}</span>
+        <span>{writer.nickname}</span>
         <span className="flex items-center gap-1">
           ♡ {likeCount >= 9999 ? "9999+" : likeCount}
         </span>
