@@ -47,7 +47,7 @@ export default async function CommunityPage({ searchParams }) {
         <p className="text-gray-900 text-[24px] tablet:text-[20px] font-bold">
           게시글
         </p>
-        <Link href="/post">
+        <Link href="/community/post">
           <Button>글쓰기</Button>
         </Link>
       </div>
