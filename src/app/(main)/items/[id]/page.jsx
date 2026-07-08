@@ -1,14 +1,23 @@
+import getQueryClient from "@/lib/getQueryClient";
 import { getProductsById } from "@/lib/ProductApi";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import Inquiry from "./_components/Inquiry";
 import ProductsDetail from "./_components/ProductsDetail";
 
 export default async function ItemDetailPage({ params }) {
   const { id } = await params;
-  const product = await getProductsById(id);
+  const queryClient = getQueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["product", id],
+    queryFn: () => getProductsById(id),
+  });
+
   return (
-    <div className="page-container">
-      <ProductsDetail productId={id} initialProduct={product} />
-      <Inquiry productId={id} />
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="page-container">
+        <ProductsDetail productId={id} />
+        <Inquiry productId={id} />
+      </div>
+    </HydrationBoundary>
   );
 }

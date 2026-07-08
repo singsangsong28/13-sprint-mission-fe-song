@@ -20,6 +20,7 @@ export default function KebabMenu({ onEdit, onDelete }) {
       <button
         onClick={() => setOpen((prev) => !prev)}
         className="cursor-pointer"
+        aria-label="수정/삭제 메뉴"
       >
         ⋮
       </button>

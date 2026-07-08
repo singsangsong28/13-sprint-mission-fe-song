@@ -6,25 +6,28 @@ import {
   favoriteProduct,
   getProductsById,
   unfavoriteProduct,
-  updateProduct,
 } from "@/lib/ProductApi";
 import { useAuth } from "@/providers/providers";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import KebabMenu from "./KebabMenu";
+import { useEffect, useRef, useState } from "react";
+import Swiper from "swiper";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import ProductEditableImages from "./ProductEditableImages";
+import ProductInfoSection from "./ProductInfoSection";
+import useProductEdit from "./useProductEdit";
 
-export default function ProductsDetail({ productId, initialProduct }) {
+export default function ProductsDetail({ productId }) {
   const { user } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [imgSrc, setImgSrc] = useState(
-    initialProduct?.images?.[0] || "/images/alt_image.png",
-  );
+  const [brokenSrc, setBrokenSrc] = useState(null);
+  const swiperElRef = useRef(null);
 
   useEffect(() => {
     if (!localStorage.getItem("accessToken")) {
@@ -38,8 +41,42 @@ export default function ProductsDetail({ productId, initialProduct }) {
       const token = localStorage.getItem("accessToken");
       return getProductsById(productId, token);
     },
-    initialData: initialProduct,
   });
+
+  const {
+    MAX_IMAGES,
+    isEditing,
+    editForm,
+    setEditForm,
+    existingImages,
+    newImages,
+    isUpdating,
+    startEditing,
+    cancelEditing,
+    handleUpdate,
+    handleEditFileChange,
+    handleRemoveExistingImage,
+    handleRemoveNewImage,
+  } = useProductEdit(productId, product);
+
+  useEffect(() => {
+    const productImages = product?.images;
+    if (!swiperElRef.current || !productImages?.length) return;
+
+    const swiperInstance = new Swiper(swiperElRef.current, {
+      modules: [Navigation, Pagination],
+      loop: productImages.length > 1,
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+      pagination: {
+        el: ".swiper-pagination",
+      },
+    });
+
+    return () => swiperInstance.destroy(true, true);
+  }, [product?.images, isEditing]);
 
   const { mutate: handleDelete } = useMutation({
     mutationFn: () => deleteProduct(productId),
@@ -47,23 +84,38 @@ export default function ProductsDetail({ productId, initialProduct }) {
     onError: (err) => alert(err.message),
   });
 
-  const { mutate: handleUpdate } = useMutation({
-    mutationFn: (data) => updateProduct(productId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["product", productId] });
-      setIsEditing(false);
-    },
-    onError: (err) => alert(err.message),
-  });
-
   const { mutate: toggleFavorite } = useMutation({
     mutationFn: () =>
-      product.isFavorite
+      product.isLiked
         ? unfavoriteProduct(productId)
         : favoriteProduct(productId),
-    onSuccess: () =>
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["product", productId] });
+      const previousProduct = queryClient.getQueryData(["product", productId]);
+
+      queryClient.setQueryData(["product", productId], (old) =>
+        old && {
+          ...old,
+          isLiked: !old.isLiked,
+          favoriteCount: old.isLiked
+            ? old.favoriteCount - 1
+            : old.favoriteCount + 1,
+        },
+      );
+
+      return { previousProduct };
+    },
+    onError: (err, _variables, context) => {
+      if (context?.previousProduct) {
+        queryClient.setQueryData(
+          ["product", productId],
+          context.previousProduct,
+        );
+      }
+      alert(err.message);
+    },
+    onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["product", productId] }),
-    onError: (err) => alert(err.message),
   });
 
   if (!product) return <div className="mt-6 text-gray-400">불러오는 중...</div>;
@@ -73,11 +125,12 @@ export default function ProductsDetail({ productId, initialProduct }) {
     description,
     price,
     tags,
+    images,
     favoriteCount,
     createdAt,
     ownerNickname,
     ownerId,
-    isFavorite,
+    isLiked,
   } = product;
 
   const isOwner = user?.id === ownerId;
@@ -88,144 +141,76 @@ export default function ProductsDetail({ productId, initialProduct }) {
     day: "2-digit",
   });
 
-  if (isEditing && editForm === null) {
-    setEditForm({ name, description, price, tags });
-  }
-
   return (
     <>
       <div className="flex flex-row mt-6 gap-6 pb-10 border-b border-gray-200">
-        <figure className="relative w-[486px] h-[486px] shrink-0">
-          <Image
-            src={imgSrc}
-            alt={name}
-            fill
-            className="rounded-2xl object-cover"
-            onError={() => setImgSrc("/images/alt_image.png")}
+        {isEditing ? (
+          <ProductEditableImages
+            existingImages={existingImages}
+            newImages={newImages}
+            maxImages={MAX_IMAGES}
+            onFileChange={handleEditFileChange}
+            onRemoveExisting={handleRemoveExistingImage}
+            onRemoveNew={handleRemoveNewImage}
           />
-        </figure>
-        <article className="flex-1">
-          <div className="flex justify-between items-start">
-            {isEditing ? (
-              <input
-                value={editForm.name}
-                onChange={(e) =>
-                  setEditForm((f) => ({ ...f, name: e.target.value }))
-                }
-                className="font-semibold text-2xl border-b border-gray-300 focus:outline-none w-full mr-4"
-              />
-            ) : (
-              <h1 className="font-semibold text-2xl">{name}</h1>
-            )}
-            {isOwner && (
-              <KebabMenu
-                onEdit={() => {
-                  setEditForm({ name, description, price, tags });
-                  setIsEditing(true);
-                }}
-                onDelete={() => setShowDeleteModal(true)}
-              />
-            )}
-          </div>
-
-          {isEditing ? (
-            <div className="flex items-baseline pb-4 border-b border-gray-300">
-              <input
-                type="text"
-                value={editForm.price}
-                onChange={(e) =>
-                  setEditForm((f) => ({ ...f, price: Number(e.target.value) }))
-                }
-                size={String(editForm.price).length || 1}
-                className="font-semibold text-[50px] focus:outline-none"
-              />
-              <span className="font-semibold text-[50px]">원</span>
-            </div>
-          ) : (
-            <p className="font-semibold text-[50px] pb-4 mb-10">
-              {price.toLocaleString()}원
-            </p>
-          )}
-
-          <h2 className="font-semibold text-[16px]">상품 소개</h2>
-          {isEditing ? (
-            <textarea
-              value={editForm.description}
-              onChange={(e) =>
-                setEditForm((f) => ({ ...f, description: e.target.value }))
-              }
-              className="w-full mt-4 mb-6 bg-gray-100 rounded-xl px-4 py-3 resize-none focus:outline-none"
-              rows={4}
-            />
-          ) : (
-            <p className="font-normal text-[16px] mt-4 mb-6 text-gray-600">
-              {description}
-            </p>
-          )}
-
-          <h3 className="mb-4">상품 태그</h3>
-          <div>
-            {(isEditing ? editForm.tags : tags).map((t) => (
-              <span
-                key={t}
-                className="mr-2 px-4 py-[6px] bg-gray-100 rounded-3xl"
-              >
-                #{t}
-              </span>
-            ))}
-          </div>
-
-          <div className="flex justify-between mt-[62px]">
-            <article className="flex gap-4 items-center">
-              <Image
-                src="/images/ic_profile.png"
-                alt="프로필 사진"
-                width={40}
-                height={40}
-              />
-              <div>
-                <p>{ownerNickname}</p>
-                <p>{date}</p>
+        ) : (
+          <div className="relative w-[486px] h-[486px] shrink-0 overflow-hidden rounded-2xl">
+            <div className="swiper h-full w-full" ref={swiperElRef}>
+              <div className="swiper-wrapper">
+                {(images?.length ? images : ["/images/alt_image.png"]).map(
+                  (src, index) => (
+                    <div
+                      className="swiper-slide relative h-full w-full"
+                      key={`${src}-${index}`}
+                    >
+                      <Image
+                        src={src === brokenSrc ? "/images/alt_image.png" : src}
+                        alt={`${name} ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        onError={() => setBrokenSrc(src)}
+                      />
+                    </div>
+                  )
+                )}
               </div>
-            </article>
-            <button
-              onClick={() => toggleFavorite()}
-              className={`flex items-center gap-1 px-4 py-2 rounded-full border cursor-pointer ${
-                isFavorite
-                  ? "border-primary-100 text-primary-100"
-                  : "border-gray-300 text-gray-500"
-              }`}
-            >
-              {isFavorite ? "♥" : "♡"} {favoriteCount}
-            </button>
-          </div>
-
-          {isEditing && (
-            <div className="flex gap-3 mt-6 justify-end">
-              <button
-                onClick={() => setIsEditing(false)}
-                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-600 cursor-pointer"
-              >
-                취소
-              </button>
-              <button
-                onClick={() => handleUpdate(editForm)}
-                className="px-6 py-2 bg-primary-100 text-white rounded-lg cursor-pointer"
-              >
-                수정 완료
-              </button>
+              <div className="swiper-pagination"></div>
+              <div className="swiper-button-prev"></div>
+              <div className="swiper-button-next"></div>
             </div>
-          )}
-        </article>
+          </div>
+        )}
+        <ProductInfoSection
+          name={name}
+          price={price}
+          description={description}
+          tags={tags}
+          isEditing={isEditing}
+          editForm={editForm}
+          setEditForm={setEditForm}
+          isOwner={isOwner}
+          onEdit={startEditing}
+          onDelete={() => setShowDeleteModal(true)}
+          ownerNickname={ownerNickname}
+          date={date}
+          isLiked={isLiked}
+          favoriteCount={favoriteCount}
+          onToggleFavorite={() => toggleFavorite()}
+          onCancelEdit={cancelEditing}
+          onSave={() => handleUpdate(editForm)}
+          isUpdating={isUpdating}
+        />
       </div>
 
       <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={() => handleDelete()}
-        title="정말로 상품을 삭제하시겠습니까?"
-        confirmText="삭제"
+        title="정말로 상품을 삭제하시겠어요?"
+        confirmText="네"
         cancelText="취소"
+        variant="danger"
+        icon
       ></Modal>
     </>
   );

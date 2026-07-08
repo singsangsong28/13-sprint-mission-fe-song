@@ -54,6 +54,17 @@ export const tokenFetch = async (url, options = {}) => {
   return parseResponse(response);
 };
 
+export const tokenUploadFetch = async (url, formData) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  const res = await fetch(`${BASE_URL}${url}`, {
+    method: 'POST',
+    headers: { ...(token && { Authorization: `Bearer ${token}` }) },
+    body: formData,
+  });
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  return parseResponse(res);
+};
+
 export const dynamicFetch = async (url, options = {}) => {
   const { headers, ...rest } = options;
   const res = await fetch(`${BASE_URL}${url}`, {
