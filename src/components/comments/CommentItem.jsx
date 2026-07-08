@@ -34,13 +34,12 @@ export default function CommentItem({ comment, onUpdate, onDelete }) {
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="bg-gray-100 w-full px-6 py-4 rounded-xl resize-none  mt-10 mb-4 "
+            className="bg-gray-100 w-full px-6 py-4 rounded-xl resize-none mt-10 mb-4"
           />
         ) : (
           <p>{comment.content}</p>
         )}
 
-        {/* 수정 중이 아닐 때만 케밥 메뉴 노출 */}
         {!isEditing && isOwner && (
           <KebabMenu
             onEdit={() => setIsEditing(true)}

@@ -1,66 +1,34 @@
 "use client";
 
+import CommentBoard from "@/components/comments/CommentBoard";
 import {
   createComment,
   deleteComment,
   getComments,
   updateComment,
 } from "@/lib/PostAPI";
-import { useEffect, useState } from "react";
-import CommentForm from "./CommentForm";
-import CommentList from "./CommentList";
 
 export default function CommentSection({ postId }) {
-  const [comments, setComments] = useState([]);
-
-  const fetchComments = async () => {
-    try {
-      setComments(await getComments(postId));
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchComments();
-  }, [postId]);
-
-  const handleCreate = async (content) => {
-    try {
-      await createComment(postId, { content });
-      fetchComments();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  const handleUpdate = async (commentId, content) => {
-    try {
-      await updateComment(commentId, { content });
-      fetchComments();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  const handleDelete = async (commentId) => {
-    if (!confirm("댓글을 삭제하시겠습니까?")) return;
-    try {
-      await deleteComment(commentId);
-      fetchComments();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
   return (
-    <>
-      <CommentForm onSubmit={handleCreate} />
-      <CommentList
-        comments={comments}
-        onUpdate={handleUpdate}
-        onDelete={handleDelete}
-      />
-    </>
+    <CommentBoard
+      queryKey={["comments", "post", postId]}
+      queryFn={() => getComments(postId)}
+      createFn={(content) => createComment(postId, { content })}
+      updateFn={(commentId, content) => updateComment(commentId, { content })}
+      deleteFn={(commentId) => deleteComment(commentId)}
+      heading="댓글달기"
+      placeholder="댓글을 입력해주세요."
+      deleteConfirmText="댓글을 삭제하시겠습니까?"
+      emptyImageSrc="/images/Img_reply_empty.png"
+      emptyImageAlt="빈 댓글"
+      emptyImageWidth={100}
+      emptyImageHeight={100}
+      emptyText={
+        <>
+          아직 댓글이 없어요. <br /> 지금 댓글을 달아보세요!
+        </>
+      }
+      backHref="/community"
+    />
   );
 }
