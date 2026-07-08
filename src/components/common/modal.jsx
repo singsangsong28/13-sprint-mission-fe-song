@@ -10,6 +10,8 @@ export default function Modal({
   onConfirm,
   confirmText = "확인",
   cancelText = "취소",
+  variant = "default",
+  icon = false,
 }) {
   useEffect(() => {
     if (!isOpen) return;
@@ -29,16 +31,40 @@ export default function Modal({
 
   if (!isOpen) return null;
 
+  const isDanger = variant === "danger";
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={onClose}
     >
       <div
-        className="w-[calc(100%-32px)] max-w-130 bg-white rounded-2xl shadow-lg px-6 py-8 tablet:px-10 tablet:py-10"
+        className={`w-[calc(100%-32px)] max-w-130 bg-white rounded-2xl shadow-lg px-6 py-8 tablet:px-10 tablet:py-10 ${
+          icon ? "text-center" : ""
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
-{title && (
+        {icon && (
+          <div className="mx-auto mb-4 flex w-12 h-12 items-center justify-center rounded-full bg-error-red">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 13l4 4L19 7"
+                stroke="white"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        )}
+
+        {title && (
           <h2 className="text-[20px] font-bold text-gray-900 mb-[16px]">
             {title}
           </h2>
@@ -52,14 +78,22 @@ export default function Modal({
           {onConfirm && onClose && (
             <button
               onClick={onClose}
-              className="flex-1 py-3.5 rounded-lg border border-gray-200 text-gray-700 font-semibold text-[16px] cursor-pointer hover:bg-gray-50"
+              className={`flex-1 py-3.5 font-semibold text-[16px] cursor-pointer ${
+                isDanger
+                  ? "rounded-lg border border-error-red text-error-red hover:bg-red-50"
+                  : "rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
+              }`}
             >
               {cancelText}
             </button>
           )}
           <button
             onClick={onConfirm ?? onClose}
-            className="flex-1 py-3.5 rounded-lg bg-primary-100 text-white font-semibold text-[16px] cursor-pointer hover:bg-primary-200"
+            className={`flex-1 py-3.5 font-semibold text-[16px] cursor-pointer ${
+              isDanger
+                ? "rounded-lg bg-error-red text-white hover:bg-red-600"
+                : "rounded-lg bg-primary-100 text-white hover:bg-primary-200"
+            }`}
           >
             {confirmText}
           </button>
