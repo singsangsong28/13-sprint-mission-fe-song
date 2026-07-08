@@ -1,5 +1,6 @@
 "use client";
 import Modal from "@/components/common/modal";
+import { useAuth } from "@/providers/providers";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,6 +17,7 @@ const formatMessage = (field, message) => {
 
 export default function LoginPage() {
   const router = useRouter();
+  const { refreshUser } = useAuth();
   const [showPw, setShowPw] = useState(false);
   const [modal, setModal] = useState({ isOpen: false, message: "" });
 
@@ -38,11 +40,15 @@ export default function LoginPage() {
   const { mutate: signIn, isPending } = useMutation({
     mutationFn: async (formData) => {
       const res = await fetch(
-        "https://panda-market-api.vercel.app/auth/signIn",
+        "https://backend-deploy-d1um.onrender.com/login",
         {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            email: formData.email,
+            encryptedpassword: formData.password,
+          }),
         },
       );
       if (!res.ok) {
@@ -53,8 +59,9 @@ export default function LoginPage() {
       }
       return res.json();
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       localStorage.setItem("accessToken", data.accessToken);
+      await refreshUser();
       router.push("/items");
     },
     onError: (err) => {
@@ -140,7 +147,11 @@ export default function LoginPage() {
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
               >
                 <Image
-                  src={showPw ? "/images/btn_visibility_on_24px.png" : "/images/btn_visibile_off.png"}
+                  src={
+                    showPw
+                      ? "/images/btn_visibility_on_24px.png"
+                      : "/images/btn_visibile_off.png"
+                  }
                   width={24}
                   height={24}
                   alt={showPw ? "비밀번호 숨기기" : "비밀번호 보기"}
@@ -165,7 +176,11 @@ export default function LoginPage() {
         <div className="flex items-center justify-between rounded-lg bg-blue-50 border border-blue-200 px-6 py-4 h-[74px]">
           <span className="text-[16px] text-gray-600">간편 로그인하기</span>
           <div className="flex gap-4">
-            <Link href="https://www.google.com" target="_blank" rel="noopener noreferrer">
+            <Link
+              href="https://www.google.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Image
                 src="/images/google-favicon.png"
                 width={42}
@@ -173,7 +188,11 @@ export default function LoginPage() {
                 alt="google_favicon"
               />
             </Link>
-            <Link href="https://www.kakaocorp.com/page" target="_blank" rel="noopener noreferrer">
+            <Link
+              href="https://www.kakaocorp.com/page"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Image
                 src="/images/kakao-favicon.png"
                 width={42}

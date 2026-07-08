@@ -1,30 +1,24 @@
 "use client";
 
-import { getMe } from "@/lib/UserAPI";
-import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/providers/providers";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Header() {
   const pathname = usePathname();
-  const [token, setToken] = useState(null);
-
-  useEffect(() => {
-    setToken(localStorage.getItem("accessToken"));
-  }, []);
-
-  const { data: user } = useQuery({
-    queryKey: ["me"],
-    queryFn: () => getMe(token),
-    enabled: !!token,
-  });
+  const router = useRouter();
+  const { user, logout } = useAuth();
 
   const getLinkClass = (href) =>
     `whitespace-nowrap font-bold text-[16px] tablet:text-[18px] px-[6px] tablet:px-[15px] py-[21px] ${
       pathname === href ? "text-primary-100" : "text-gray-600"
     }`;
+
+  const handleLogout = () => {
+    logout();
+    router.push("/");
+  };
 
   return (
     <>
@@ -62,12 +56,19 @@ export default function Header() {
                 className="rounded-full"
               />
               <span className="font-normal text-[18px] text-gray-600 hidden tablet:block">
-                {user.nickname}
+                {user.nickName}
               </span>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="whitespace-nowrap text-[14px] tablet:text-[16px] text-gray-500 underline cursor-pointer"
+              >
+                로그아웃
+              </button>
             </div>
           ) : (
             <Link href="/login">
-              <div className="whitespace-nowrap px-[14px] tablet:px-[24px] py-[23px] bg-primary-100 rounded-[8px] h-[42px] text-white font-bold text-[16px] tablet:text-[18px] my-[14px] flex items-center">
+              <div className="whitespace-nowrap px-[14px] tablet:px-[24px] py-[23px] bg-primary-100 rounded-[8px] h-[42px] text-white font-bold text-[16px] tablet:text-[18px] my-[14px] flex items-center ">
                 로그인
               </div>
             </Link>

@@ -27,11 +27,10 @@ export const tokenFetch = async (url, options = {}) => {
 
   if (response.status === 401) {
     try {
-      const refreshToken = localStorage.getItem('refreshToken');
       const refreshResponse = await fetch(`${BASE_URL}/auth/refresh-token`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
       });
 
       if (refreshResponse.ok) {

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useAuth } from "./providers";
 
-const protectedPaths = ["/post"];
+const protectedPaths = ["/community/post", "/items/post"];
 
 const publicPaths = ["/login", "/auth/signup"];
 
@@ -20,11 +20,13 @@ export default function RouteGuard({ children }) {
     const path = pathname.split("?")[0];
 
     const isProtectedRoute = protectedPaths.some(
-      (route) => path === route || (path.startsWith(route + "/") && route !== "/"),
+      (route) =>
+        path === route || (path.startsWith(route + "/") && route !== "/"),
     );
 
     const isPublicRoute = publicPaths.some(
-      (route) => path === route || (path.startsWith(route + "/") && route !== "/"),
+      (route) =>
+        path === route || (path.startsWith(route + "/") && route !== "/"),
     );
 
     if (isProtectedRoute && !user) {

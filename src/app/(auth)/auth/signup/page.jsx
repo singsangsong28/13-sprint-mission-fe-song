@@ -18,7 +18,11 @@ const formatErrorMessage = (field, message) => {
 
 export default function SignupPage() {
   const router = useRouter();
-  const [modal, setModal] = useState({ isOpen: false, message: "", isSuccess: false });
+  const [modal, setModal] = useState({
+    isOpen: false,
+    message: "",
+    isSuccess: false,
+  });
   const [showPw, setShowPw] = useState(false);
   const [showPwConfirm, setShowPwConfirm] = useState(false);
   const [form, setForm] = useState({
@@ -43,11 +47,15 @@ export default function SignupPage() {
   const { mutate: signup, isPending } = useMutation({
     mutationFn: async (formData) => {
       const res = await fetch(
-        "https://panda-market-api.vercel.app/auth/signUp",
+        "https://backend-deploy-d1um.onrender.com/users",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            email: formData.email,
+            nickName: formData.nickname,
+            encryptedpassword: formData.password,
+          }),
         },
       );
       if (!res.ok) {
@@ -58,8 +66,7 @@ export default function SignupPage() {
       }
       return res.json();
     },
-    onSuccess: (data) => {
-      localStorage.setItem("accessToken", data.accessToken);
+    onSuccess: () => {
       setModal({ isOpen: true, message: "", isSuccess: true });
     },
     onError: (err) => {
@@ -71,7 +78,11 @@ export default function SignupPage() {
         });
         setErrors((prev) => ({ ...prev, ...newErrors }));
       }
-      setModal({ isOpen: true, message: err.message || "회원가입에 실패했습니다.", isSuccess: false });
+      setModal({
+        isOpen: true,
+        message: err.message || "회원가입에 실패했습니다.",
+        isSuccess: false,
+      });
     },
   });
 
@@ -162,7 +173,11 @@ export default function SignupPage() {
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
               >
                 <Image
-                  src={showPw ? "/images/btn_visibility_on_24px.png" : "/images/btn_visibile_off.png"}
+                  src={
+                    showPw
+                      ? "/images/btn_visibility_on_24px.png"
+                      : "/images/btn_visibile_off.png"
+                  }
                   width={24}
                   height={24}
                   alt={showPw ? "비밀번호 숨기기" : "비밀번호 보기"}
@@ -192,7 +207,11 @@ export default function SignupPage() {
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
               >
                 <Image
-                  src={showPwConfirm ? "/images/btn_visibility_on_24px.png" : "/images/btn_visibile_off.png"}
+                  src={
+                    showPwConfirm
+                      ? "/images/btn_visibility_on_24px.png"
+                      : "/images/btn_visibile_off.png"
+                  }
                   width={24}
                   height={24}
                   alt={showPwConfirm ? "비밀번호 숨기기" : "비밀번호 보기"}
@@ -220,7 +239,11 @@ export default function SignupPage() {
         <div className="flex items-center justify-between rounded-lg bg-blue-50 border border-blue-200 px-6 py-4 h-[74px]">
           <span className="text-[16px] text-gray-600">간편 로그인하기</span>
           <div className="flex gap-4">
-            <Link href="https://www.google.com" target="_blank" rel="noopener noreferrer">
+            <Link
+              href="https://www.google.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Image
                 src="/images/google-favicon.png"
                 width={42}
@@ -228,7 +251,11 @@ export default function SignupPage() {
                 alt="google_favicon"
               />
             </Link>
-            <Link href="https://www.kakaocorp.com/page" target="_blank" rel="noopener noreferrer">
+            <Link
+              href="https://www.kakaocorp.com/page"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Image
                 src="/images/kakao-favicon.png"
                 width={42}
@@ -247,8 +274,10 @@ export default function SignupPage() {
       </footer>
       <Modal
         isOpen={modal.isOpen}
-        onConfirm={modal.isSuccess ? () => router.push("/items") : undefined}
-        onClose={() => setModal({ isOpen: false, message: "", isSuccess: false })}
+        onConfirm={modal.isSuccess ? () => router.push("/login") : undefined}
+        onClose={() =>
+          setModal({ isOpen: false, message: "", isSuccess: false })
+        }
         title={modal.isSuccess ? "가입이 완료되었습니다!" : "회원가입 실패"}
         confirmText={modal.isSuccess ? "확인" : "닫기"}
       >
