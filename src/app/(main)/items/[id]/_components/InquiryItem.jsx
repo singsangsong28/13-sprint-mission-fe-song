@@ -16,11 +16,11 @@ function timeAgo(dateString) {
   return `${Math.floor(diff / 31536000)}년 전`;
 }
 
-export default function CommentItem({ comment, onUpdate, onDelete }) {
-  const { user } = useAuth();
-  const isOwner = user?.id === comment.writer.id;
+export default function InquiryItem({ comment, onUpdate, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(comment.content);
+  const { user } = useAuth();
+  const isOwner = user?.id === comment.writer.id;
 
   const handleSave = async () => {
     await onUpdate(comment.id, content);
@@ -39,11 +39,6 @@ export default function CommentItem({ comment, onUpdate, onDelete }) {
         ) : (
           <p>{comment.content}</p>
         )}
-
-<<<<<<<< HEAD:src/components/comments/CommentItem.jsx
-========
-        {/* 수정 중이 아닐 때만 케밥 메뉴 노출 */}
->>>>>>>> upstream/next-송현규:src/app/(main)/community/[id]/_components/CommentItem.jsx
         {!isEditing && isOwner && (
           <KebabMenu
             onEdit={() => setIsEditing(true)}
@@ -61,7 +56,6 @@ export default function CommentItem({ comment, onUpdate, onDelete }) {
             취소
           </button>
           <button
-            type="submit"
             onClick={handleSave}
             className="text-white rounded-lg bg-primary-100 py-3 px-[23px] cursor-pointer"
           >
