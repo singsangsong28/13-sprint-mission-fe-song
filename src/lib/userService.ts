@@ -1,5 +1,6 @@
-import { tokenFetch } from './fetchClient';
+import { tokenFetch } from "./fetchClient";
+import type { User } from "./types";
 
 export const userService = {
-  getMe: () => tokenFetch('/users/me'),
+  getMe: (): Promise<User> => tokenFetch<User>("/users/me"),
 };

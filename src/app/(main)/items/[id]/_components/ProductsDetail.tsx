@@ -8,6 +8,7 @@ import {
   Product,
   unfavoriteProduct,
 } from "@/lib/ProductApi";
+import { getToken } from "@/lib/authService";
 import { useAuth } from "@/providers/providers";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
@@ -30,18 +31,9 @@ export default function ProductsDetail({ productId }: { productId: string }) {
   const [brokenSrc, setBrokenSrc] = useState<string | null>(null);
   const swiperElRef = useRef(null);
 
-  useEffect(() => {
-    if (!localStorage.getItem("accessToken")) {
-      router.replace("/login");
-    }
-  }, [router]);
-
   const { data: product } = useQuery({
     queryKey: ["product", productId],
-    queryFn: () => {
-      const token = localStorage.getItem("accessToken");
-      return getProductsById(productId, token);
-    },
+    queryFn: () => getProductsById(productId, getToken()),
   });
 
   const {

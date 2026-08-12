@@ -1,28 +1,15 @@
 "use client";
 
-import { authService } from "@/lib/authService";
+import { authService, getToken } from "@/lib/authService";
+import type { User } from "@/lib/types";
 import { userService } from "@/lib/userService";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from "react";
-import RouteGuard from "./RouteGuard";
-
-type User = {
-  id: number;
-  nickName: string;
-  email: string;
-  image: string | null;
-  provider: string | null;
-  providerId: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { createContext, type ReactNode, useContext, useState } from "react";
 
 type AuthContextType = {
   user: User | null;
@@ -39,77 +26,32 @@ export const useAuth = () => {
   return context;
 };
 
-function getCachedUser() {
-  if (typeof window === "undefined") return null;
-  try {
-    const cached = localStorage.getItem("cachedUser");
-    return cached ? JSON.parse(cached) : null;
-  } catch {
-    return null;
-  }
-}
-
-function setCachedUser(user: User | null) {
-  if (typeof window === "undefined") return;
-  if (user) {
-    localStorage.setItem("cachedUser", JSON.stringify(user));
-  } else {
-    localStorage.removeItem("cachedUser");
-  }
-}
-
 function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  useLayoutEffect(() => {
-    const cached = getCachedUser();
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate from localStorage (external store) once before paint, without causing an SSR/client mismatch
-    if (cached) setUser(cached);
-  }, []);
-
-  const applyUser = (data: User | null) => {
-    setUser(data);
-    setCachedUser(data);
-  };
-
-  const getUser = async () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
-      const data = await userService.getMe();
-      applyUser(data);
-    } catch {
-      applyUser(null);
-    }
-  };
+  // 프로필은 캐시에 눌러 담지 않고 매번 서버에서 받는다.
+  // staleTime 짧게 잡아 서버에서 닉네임/권한이 바뀌면 곧 반영되게 한다.
+  const { data: user = null, isLoading } = useQuery<User | null>({
+    queryKey: ["me"],
+    queryFn: () => (getToken() ? userService.getMe() : Promise.resolve(null)),
+    retry: false,
+    staleTime: 30 * 1000,
+  });
 
   const logout = () => {
     authService.logout();
-    applyUser(null);
+    queryClient.setQueryData(["me"], null);
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const authCheck = token
-      ? userService
-          .getMe()
-          .then(applyUser)
-          .catch(() => applyUser(null))
-      : Promise.resolve();
-    authCheck.finally(() => setIsAuthLoading(false));
-  }, []);
+  const refreshUser = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["me"] });
+  };
 
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        isAuthLoading,
-        logout,
-        refreshUser: getUser,
-      }}
+      value={{ user, isAuthLoading: isLoading, logout, refreshUser }}
     >
-      <RouteGuard>{children}</RouteGuard>
+      {children}
     </AuthContext.Provider>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import type { Comment } from "@/lib/types";
 import { useAuth } from "@/providers/providers";
 import Image from "next/image";
 import { useState } from "react";
@@ -15,13 +16,6 @@ function timeAgo(dateString: string) {
   if (diff < 31536000) return `${Math.floor(diff / 2592000)}개월 전`;
   return `${Math.floor(diff / 31536000)}년 전`;
 }
-
-export type Comment = {
-  id: string;
-  content: string;
-  createdAt: string;
-  writer: { id: number; nickname: string; image?: string };
-};
 
 export default function CommentItem({
   comment,

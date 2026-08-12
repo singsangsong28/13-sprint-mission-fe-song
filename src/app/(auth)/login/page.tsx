@@ -1,5 +1,6 @@
 "use client";
 import Modal from "@/components/common/modal";
+import { setToken } from "@/lib/authService";
 import { useAuth } from "@/providers/providers";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
@@ -67,8 +68,7 @@ export default function LoginPage() {
   >({
     mutationFn: async (formData: LoginForm) => {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_KEY}/login
-        `,
+        `${process.env.NEXT_PUBLIC_API_KEY}/login`,
         {
           method: "POST",
           credentials: "include",
@@ -88,7 +88,7 @@ export default function LoginPage() {
       return res.json();
     },
     onSuccess: async (data) => {
-      localStorage.setItem("accessToken", data.accessToken);
+      setToken(data.accessToken);
       await refreshUser();
       router.push("/items");
     },

@@ -16,13 +16,22 @@ export default function ProductsSection({
   page: number;
   pageSize: number;
 }) {
-  const { data } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["products", orderBy, keyword, page],
     queryFn: () => getProducts(orderBy, keyword, page),
   });
 
   const products = data?.list ?? [];
   const totalCount = data?.totalCount ?? 0;
+
+  if (isLoading) return <p className="mt-6 text-gray-400">불러오는 중...</p>;
+
+  if (isError)
+    return (
+      <p className="mt-6 text-red-400">
+        목록을 불러오지 못했어요. 잠시 후 다시 시도해주세요.
+      </p>
+    );
 
   return (
     <>
